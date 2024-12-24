@@ -34,6 +34,15 @@ async function run() {
     });
 
     // ********************GET*****************************
+
+    // Route to get all cars posted by that logged in user
+    app.get("/my-cars/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { "owner.email": email };
+      const result = await carsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // ********************PATCH***************************
     // ********************PUT***************************
     // ********************DELETE***************************
