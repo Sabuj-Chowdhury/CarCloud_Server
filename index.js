@@ -43,8 +43,18 @@ async function run() {
       res.send(result);
     });
 
+    // Route for single car data from DB by "_id"
+    app.get("/car/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await carsCollection.findOne(query);
+      res.send(result);
+    });
+
     // ********************PATCH***************************
+
     // ********************PUT***************************
+
     // ********************DELETE***************************
 
     // route for deleting a car data from DB
