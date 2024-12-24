@@ -55,6 +55,20 @@ async function run() {
 
     // ********************PUT***************************
 
+    // routes for update a single car by id in the DB
+    app.put("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const update = {
+        $set: data,
+      };
+      const options = { upsert: true };
+
+      const result = await carsCollection.updateOne(filter, update, options);
+      res.send(result);
+    });
+
     // ********************DELETE***************************
 
     // route for deleting a car data from DB
