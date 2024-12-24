@@ -21,6 +21,23 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    const db = client.db("carCloud-db"); // database
+    const carsCollection = db.collection("cars"); //cars collection
+
+    // ********************POST****************************
+
+    // Route to store car details with user info in DB
+    app.post("/add-car", async (req, res) => {
+      const data = req.body;
+      const result = await carsCollection.insertOne(data);
+      res.send(result);
+    });
+
+    // ********************GET*****************************
+    // ********************PATCH***************************
+    // ********************PUT***************************
+    // ********************DELETE***************************
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
