@@ -51,6 +51,22 @@ async function run() {
       res.send(result);
     });
 
+    // Route to get all cars or using limit
+    app.get("/all-cars", async (req, res) => {
+      const limit = parseInt(req.query.limit);
+      let result;
+
+      if (!isNaN(limit) && limit > 0) {
+        // If a valid limit is provided, return only that many cars
+        result = await carsCollection.find().limit(limit).toArray();
+      } else {
+        // If no limit is provided or it's not a valid number, return all cars
+        result = await carsCollection.find().toArray();
+      }
+
+      res.send(result);
+    });
+
     // ********************PATCH***************************
 
     // ********************PUT***************************
