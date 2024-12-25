@@ -23,6 +23,7 @@ async function run() {
   try {
     const db = client.db("carCloud-db"); // database
     const carsCollection = db.collection("cars"); //cars collection
+    const bookingCollections = db.collection("bookings"); //bookings collection
 
     // ********************POST****************************
 
@@ -30,6 +31,20 @@ async function run() {
     app.post("/add-car", async (req, res) => {
       const data = req.body;
       const result = await carsCollection.insertOne(data);
+      res.send(result);
+    });
+
+    // Route to store booking details and update booking count on carsCollection
+    app.post("/add-booking", async (req, res) => {
+      const data = req.body;
+      const result = await bookingCollections.insertOne(data);
+
+      // increase booking count on carCollection
+      const filter = { _id: new ObjectId(data.carID) };
+      const update = {
+        $inc: { bookingCount: 1 },
+      };
+      const updateBooking = await carsCollection.updateOne(filter, update);
       res.send(result);
     });
 
