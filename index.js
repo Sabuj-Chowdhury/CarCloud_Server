@@ -114,6 +114,18 @@ async function run() {
 
     // ********************PATCH***************************
 
+    // Routes for update booking status
+    app.patch("/booking-status/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const { bookingStatus } = req.body;
+      const update = {
+        $set: { bookingStatus },
+      };
+      const result = await bookingCollections.updateOne(filter, update);
+      res.send(result);
+    });
+
     // ********************PUT***************************
 
     // routes for update a single car by id in the DB
