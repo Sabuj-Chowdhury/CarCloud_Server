@@ -51,17 +51,27 @@ async function run() {
       res.send(result);
     });
 
-    // Route to get all cars or using limit
+    // Route to get all cars or using limit also sorting on price and date added
     app.get("/all-cars", async (req, res) => {
       const limit = parseInt(req.query.limit);
+      const sort = req.query.sort;
       let result;
 
+      let sortOptions = {};
+      if (sort === "asc") {
+        sortOptions.price = 1; // Sort by price ascending
+      } else if (sort === "dsc") {
+        sortOptions.dateAdded = -1; // (newest first)
+      }
+
       if (!isNaN(limit) && limit > 0) {
-        // If a valid limit is provided, return only that many cars
-        result = await carsCollection.find().limit(limit).toArray();
+        result = await carsCollection
+          .find()
+          .sort(sortOptions)
+          .limit(limit)
+          .toArray();
       } else {
-        // If no limit is provided or it's not a valid number, return all cars
-        result = await carsCollection.find().toArray();
+        result = await carsCollection.find().sort(sortOptions).toArray();
       }
 
       res.send(result);
