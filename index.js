@@ -58,6 +58,14 @@ async function run() {
       res.send(result);
     });
 
+    // Route to get all bookings by that logged in user
+    app.get("/bookings/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { "customer.email": email };
+      const result = await bookingCollections.find(query).toArray();
+      res.send(result);
+    });
+
     // Route for single car data from DB by "_id"
     app.get("/car/:id", async (req, res) => {
       const id = req.params.id;
