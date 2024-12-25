@@ -55,14 +55,15 @@ async function run() {
     app.get("/all-cars", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const sort = req.query.sort;
-      let result;
 
       let sortOptions = {};
       if (sort === "asc") {
-        sortOptions.price = 1; // Sort by price ascending
+        sortOptions = { price: 1 }; // Ascending sort by price
       } else if (sort === "dsc") {
-        sortOptions.dateAdded = -1; // (newest first)
+        sortOptions = { price: -1 }; // Descending sort by price
       }
+
+      let result;
 
       if (!isNaN(limit) && limit > 0) {
         result = await carsCollection
@@ -73,7 +74,6 @@ async function run() {
       } else {
         result = await carsCollection.find().sort(sortOptions).toArray();
       }
-
       res.send(result);
     });
 
