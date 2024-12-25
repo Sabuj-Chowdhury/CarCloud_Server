@@ -126,6 +126,21 @@ async function run() {
       res.send(result);
     });
 
+    // Routes for updating booking duration
+    app.patch("/booking-dates/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const { startDate, endDate } = req.body;
+      const update = {
+        $set: {
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+        },
+      };
+      const result = await bookingCollections.updateOne(filter, update);
+      res.send(result);
+    });
+
     // ********************PUT***************************
 
     // routes for update a single car by id in the DB
