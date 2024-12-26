@@ -50,6 +50,20 @@ async function run() {
 
     // ********************GET*****************************
 
+    // Route to get the latest 6 cars
+    app.get("/latest-cars", async (req, res) => {
+      const query = {};
+      const sort = {
+        createdAt: -1,
+      };
+      const result = await carsCollection
+        .find(query)
+        .sort(sort)
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
     // Route to get all cars posted by that logged in user
     app.get("/my-cars/:email", async (req, res) => {
       const email = req.params.email;
