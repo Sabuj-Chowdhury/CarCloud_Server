@@ -90,7 +90,6 @@ async function run() {
 
     // Route to get all cars or using limit also sorting on price and date added Also search
     app.get("/all-cars", async (req, res) => {
-      const limit = parseInt(req.query.limit);
       const sort = req.query.sort;
       const search = req.query.search;
 
@@ -112,17 +111,10 @@ async function run() {
         };
       }
 
-      let result;
-
-      if (!isNaN(limit) && limit > 0) {
-        result = await carsCollection
-          .find(query)
-          .sort(sortOptions)
-          .limit(limit)
-          .toArray();
-      } else {
-        result = await carsCollection.find(query).sort(sortOptions).toArray();
-      }
+      const result = await carsCollection
+        .find(query)
+        .sort(sortOptions)
+        .toArray();
       res.send(result);
     });
 
