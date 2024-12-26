@@ -120,10 +120,14 @@ async function run() {
       res.send(result);
     });
 
-    // Route to get all cars posted by that logged in user
-    app.get("/my-cars/:email", async (req, res) => {
+    // Route to get all cars posted by that logged in user(secure)
+    app.get("/my-cars/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { "owner.email": email };
+      // console.log(req.cookies?.token); // to see the token
+      if (req.user.email !== req.params.email) {
+        return res.status(403).send({ message: "forbidden access!" });
+      }
       const result = await carsCollection.find(query).toArray();
       res.send(result);
     });
