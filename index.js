@@ -8,7 +8,12 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -29,18 +34,26 @@ async function run() {
     const bookingCollections = db.collection("bookings"); //bookings collection
 
     // ************jwt /token create******************
+    // token create
     app.post("/jwt", (req, res) => {
       const user = req.body;
-
       const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
         expiresIn: "24h",
       });
-
       res
         .cookie("token", token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          secure: false,
+        })
+        .send({ success: true });
+    });
+
+    // token remove on logout
+    app.post("/logout", (req, res) => {
+      res
+        .clearCookie("token", {
+          httpOnly: true,
+          secure: false,
         })
         .send({ success: true });
     });
