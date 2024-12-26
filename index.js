@@ -10,7 +10,11 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://carcloud-7bc2a.web.app",
+      "https://carcloud-7bc2a.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
@@ -33,6 +37,23 @@ async function run() {
     const carsCollection = db.collection("cars"); //cars collection
     const bookingCollections = db.collection("bookings"); //bookings collection
 
+    // custom middleware
+    const verifyToken = (req, res, next) => {
+      const token = req.cookies?.token;
+      // console.log("token in verifytoken:", token);
+      if (!token) {
+        return res.status(401).send({ message: "unauthorized access" });
+      }
+      // verify
+      jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({ message: "unauthorized access" });
+        }
+        req.user = decoded;
+        next();
+      });
+    };
+
     // ************jwt /token create******************
     // token create
     app.post("/jwt", (req, res) => {
@@ -43,7 +64,8 @@ async function run() {
       res
         .cookie("token", token, {
           httpOnly: true,
-          secure: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         })
         .send({ success: true });
     });
@@ -53,7 +75,8 @@ async function run() {
       res
         .clearCookie("token", {
           httpOnly: true,
-          secure: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         })
         .send({ success: true });
     });
@@ -105,10 +128,19 @@ async function run() {
       res.send(result);
     });
 
-    // Route to get all bookings by that logged in user
-    app.get("/bookings/:email", async (req, res) => {
+    // Route to get all bookings by that logged in user(secured)
+    app.get("/bookings/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { "customer.email": email };
+
+      // console.log(req.cookies?.token); //to see the token
+      // console.log("token", req.user.email);
+      // console.log("api", req.params.email);
+
+      if (req.user.email !== req.params.email) {
+        return res.status(403).send({ message: "forbidden access!" });
+      }
+
       const result = await bookingCollections.find(query).toArray();
       res.send(result);
     });
